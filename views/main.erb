@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- jQuery -->
+<script type="text/javascript" src="/jquery.js"></script>
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="/DataTables-1.10.4/media/css/jquery.dataTables.css">
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="/DataTables-1.10.4/media/js/jquery.dataTables.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/responsive/1.0.3/css/dataTables.responsive.css">
+ 
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/responsive/1.0.3/js/dataTables.responsive.js"></script>
+
+<meta charset="UTF-8">
+<script type="text/javascript">
+	$(document).ready( function(){
+		$('body').prepend('<table id="mytable" class="compact"></table>');
+		var tablehead = $("<thead>" +
+			    "<tr>" +
+				"<th>Cover</th>" +
+				"<th>Name</th>" +
+				"<th>Tags</th>" +
+				"<th>Author(s)</th>" +
+				"<th>Editor</th>" +
+				"<th>Subjects</th>" +
+				"<th>Summary</th>" +
+			   "</tr>"+
+		      "</thead><tbody>");
+	    var table = $('table');
+	    table.append(tablehead); 
+		$.getJSON( "catalog.json", function( data ) {
+		  $.each( data, function( key, val ) {
+		  	//get authors
+		  	var authors = [];
+		  	$.each(val.doc.authors, function(index, item)
+		  		{
+		  			authors.push(item.full_name);
+		  		}
+		  	)
+		  	//get editors
+		  	var editors = [];
+		  	$.each(val.doc.editor, function(index, item)
+		  		{
+		  			editors.push(item.name);
+		  		}
+		  	)
+		  	var record = $("<tr>" +
+		  	"<td><img src='/thumbnails/"+ key +".jpg'></td>" +
+		  	"<td>"+ val.doc.name +"</td>" +
+		  	"<td>"+ val.doc.tags +"</td>" +
+		  	"<td>"+ authors.join(", ") +"</td>" +
+		  	"<td>"+ editors.join(", ") +"</td>" +
+		  	"<td>"+ val.doc.subjects +"</td>" +
+		  	"<td>"+ val.doc.blurb +"</td>" +
+		  	"</tr>")
+		  	table.append(record);
+		  });
+		  	table.append('</tbody>');
+		    $('#mytable').DataTable( {
+		        responsive: true
+		    } );
+	});
+
+ });
+</script>
+<title>Title of the document</title>
+</head>
+<body>
+</body>
+</html>
