@@ -2,35 +2,80 @@
 <html>
 <head>
 <!-- jQuery -->
-<script type="text/javascript" src="/jquery.js"></script>
-<!-- DataTables CSS -->
-<link rel="stylesheet" type="text/css" href="/DataTables-1.10.4/media/css/jquery.dataTables.css">
-<!-- DataTables -->
-<script type="text/javascript" charset="utf8" src="/DataTables-1.10.4/media/js/jquery.dataTables.js"></script>
+
+
 
 <!-- DataTables CSS -->
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/responsive/1.0.3/css/dataTables.responsive.css">
- 
+<link rel="stylesheet" href="mystyle.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css">
+<link rel="stylesheet" href="//cdn.datatables.net/responsive/1.0.3/css/dataTables.responsive.css">
+
 <!-- DataTables -->
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/responsive/1.0.3/js/dataTables.responsive.js"></script>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/3cfcc339e89/pagination/select.js"></script>
+
+
 
 <meta charset="UTF-8">
 <script type="text/javascript">
+	function checkBlurb(d){
+		if (d != "") {
+			return d;
+		}
+		else {
+			return "N/A";
+		}
+	}
+	function generateLinks(d){
+		var result = ""
+		if (typeof d == 'string'){
+		d = d.split(',');
+		}
+		$.each(d, function(key, value){
+			if (key == 0){
+			result +="<a href='#'>"+ value.trim() +"</a>"
+			}
+			else
+			{
+			 result +=", <a href='#'>"+ value.trim() +"</a>"
+			}
+		});
+		return result;
+	}
+
 	$(document).ready( function(){
-		$('body').prepend('<table id="mytable" class="compact"></table>');
+		$('body').prepend('<table id="mytable" class="display responsive" cellspacing="0" width="100%"></table>');
 		var tablehead = $("<thead>" +
 			    "<tr>" +
-				"<th>Cover</th>" +
-				"<th>Name</th>" +
-				"<th>Tags</th>" +
-				"<th>Author(s)</th>" +
-				"<th>Editor</th>" +
-				"<th>Subjects</th>" +
-				"<th>Summary</th>" +
+				"<th class='all'>Cover</th>" +
+				"<th class='mobile'>Book Information</th>" +
+				"<th class='min-tablet'>Name</th>" +
+				"<th class='min-tablet'>Author(s)</th>" +
+				"<th class='none'>Summary</th>" +
+				"<th class='none'>Editor</th>" +
+				"<th class='min-desktop'>Tags</th>" +
+				"<th class='min-desktop'>Subjects</th>" +
+				"<th class='none'>Action</th>" +
 			   "</tr>"+
-		      "</thead><tbody>");
-	    var table = $('table');
-	    table.append(tablehead); 
+		      "</thead>"+
+		      "<tfoot>" +
+    		"<tr>"+
+      "<td></td>"+
+      "<td></td>"+      
+      "<td></td>"+
+	  "<td></td>"+
+      "<td></td>"+
+      "<td></td>"+
+      "<td></td>"+  
+      "<td></td>"+  
+      "<td></td>"+       
+	  "</tr>"+
+	  "</tfoot>"+
+	  "<tbody>");
+	    var mytable = $('table');
+	    mytable.append(tablehead); 
 		$.getJSON( "catalog.json", function( data ) {
 		  $.each( data, function( key, val ) {
 		  	//get authors
@@ -48,20 +93,103 @@
 		  		}
 		  	)
 		  	var record = $("<tr>" +
-		  	"<td><img src='/thumbnails/"+ key +".jpg'></td>" +
+		  	"<td><img src='/thumbnails/"+ key +".jpg' height='100'></td>" +
+		  	"<td>Title: "+ val.doc.name +"<br><br>Author(s): " + authors.join(", ")+"</td>" +
 		  	"<td>"+ val.doc.name +"</td>" +
-		  	"<td>"+ val.doc.tags +"</td>" +
-		  	"<td>"+ authors.join(", ") +"</td>" +
-		  	"<td>"+ editors.join(", ") +"</td>" +
-		  	"<td>"+ val.doc.subjects +"</td>" +
-		  	"<td>"+ val.doc.blurb +"</td>" +
+		  	"<td>"+ generateLinks(authors)+"</a></td>" +		 
+		  	"<td>"+ checkBlurb(val.doc.blurb) +"</td>" +
+		  	"<td>"+ generateLinks(editors)+"</td>" +
+			"<td>"+ generateLinks(val.doc.tags) +"</td>" +
+		  	"<td>"+ generateLinks(val.doc.subjects) +"</td>" +
+		  	"<td><button type='button'>Read</button></td>" +
 		  	"</tr>")
-		  	table.append(record);
+		  	mytable.append(record);
 		  });
-		  	table.append('</tbody>');
-		    $('#mytable').DataTable( {
-		        responsive: true
-		    } );
+		  	mytable.append('</tbody>');
+
+		    var oTable = $('#mytable').DataTable( 
+		    {
+				   "sDom": 'T<"clear">lfrtip',
+					        "oTableTools": {
+					            "aButtons": [
+					                "copy",
+					                "print",
+					                {
+					                    "sExtends":    "collection",
+					                    "sButtonText": "Save",
+					                    "aButtons":    [ "csv", "xls", "pdf" ]
+					                }
+					            ]
+					        },
+		        responsive: true,
+		        sPaginationType: "listbox",
+		         lengthMenu: [ 5, 10, 15, 20, 25 ],
+		         columnDefs: [ { targets: 0, orderable: false }, {className: 'summary', targets: 4} ],
+		         order: [[ 7, 'asc' ]],
+		        initComplete: function () {
+		            var api = this.api();
+		            api.columns().indexes().flatten().each( function ( i ) {
+		          		if (i ==0 || i==1 || i == 4) {
+		          			//do not include image, info, and summary filter
+		                 }
+		                 else{
+		                var column = api.column( i );
+		                var select = $('<select><option value=""></option></select>')
+		                    .appendTo( $(column.footer()).empty() )
+		                    .on( 'change', function () {
+		                        var val = $.fn.dataTable.util.escapeRegex(
+		                            $(this).val()
+		                        );
+		 
+		                        column
+		                            .search( val ? val : '', true, false )
+		                            .draw();
+		                    } );
+
+						 if (i==3 || i ==5 || i==6 || i==7){
+						 	var data = [];
+							column.data().unique().sort().each( function ( d, j ) {
+								stringArray = $(d).text().split(",");
+			                	for (var i=0; i < stringArray.length;	 i++){
+			                		if (data.indexOf(stringArray[i])==-1){
+			                			data.push(stringArray[i]);
+			                		}
+			                	}
+			                	});
+		                	$.each(data.sort(), function () {
+		                    select.append( '<option value="'+this.trim()+'">'+this.trim()+'</option>' );
+		                	});
+		                 }
+
+						else{
+
+			                column.data().unique().sort().each( function ( d, j ) {
+			                    select.append( '<option value="'+d.trim()+'">'+d.trim()+'</option>' );
+			                });
+		            	}
+		             }
+		          } );  
+		        }
+
+		    });
+
+					var myTableAPI = $('#mytable').DataTable();
+					 
+					$('table').on( 'click', 'a', function (event) {
+						event.preventDefault();
+					    var colIdx = myTableAPI
+					   		.cell($(this).parent())
+					    	.index().column;
+					    	$('select', $(myTableAPI.column(colIdx).footer())).val($(this).text()).change();
+
+					} );
+					// THIS TRIGGERS SEARCH BOX FUNCTION - OMMITTED IN FOR THE FILTERING OPTION INSTEAD
+					// var table = $('#example').DataTable();
+					// $('table').on( 'click', 'a', function(event) {
+					// 	event.preventDefault();
+					// 	$('#mytable').DataTable().search($(this).text()).draw();
+					// });
+		
 	});
 
  });
