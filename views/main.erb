@@ -8,12 +8,14 @@
 <!-- DataTables CSS -->
 <link rel="stylesheet" href="mystyle.css">
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.4/css/jquery.dataTables.css">
-<link rel="stylesheet" href="//cdn.datatables.net/responsive/1.0.3/css/dataTables.responsive.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/responsive/1.0.3/css/dataTables.responsive.css">
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/tabletools/2.2.3/css/dataTables.tableTools.css">
 
 <!-- DataTables -->
 <script type="text/javascript" src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/responsive/1.0.3/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/responsive/1.0.3/js/dataTables.responsive.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/tabletools/2.2.3/js/dataTables.tableTools.min.js"></script>	
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/plug-ins/3cfcc339e89/pagination/select.js"></script>
 
 
@@ -44,6 +46,7 @@
 		});
 		return result;
 	}
+
 
 	$(document).ready( function(){
 		$('body').prepend('<table id="mytable" class="display responsive" cellspacing="0" width="100%"></table>');
@@ -109,18 +112,15 @@
 
 		    var oTable = $('#mytable').DataTable( 
 		    {
-				   "sDom": 'T<"clear">lfrtip',
-					        "oTableTools": {
-					            "aButtons": [
-					                "copy",
-					                "print",
-					                {
-					                    "sExtends":    "collection",
-					                    "sButtonText": "Save",
-					                    "aButtons":    [ "csv", "xls", "pdf" ]
-					                }
-					            ]
-					        },
+        		sDom: 'T<"clear">lfrtip',
+		        tableTools: {
+			            "aButtons": [
+			                {
+			                    "sExtends":     "text",
+			                    "sButtonText": "Clear filters"
+			                }
+			            ]
+		        },
 		        responsive: true,
 		        sPaginationType: "listbox",
 		         lengthMenu: [ 5, 10, 15, 20, 25 ],
@@ -173,16 +173,46 @@
 
 		    });
 
+
 					var myTableAPI = $('#mytable').DataTable();
 					 
 					$('table').on( 'click', 'a', function (event) {
 						event.preventDefault();
-					    var colIdx = myTableAPI
+						cellIndx = myTableAPI
 					   		.cell($(this).parent())
-					    	.index().column;
+					    	.index();
+					    if (cellIndx != undefined){
+					    	var colIdx = cellIndx.column;
 					    	$('select', $(myTableAPI.column(colIdx).footer())).val($(this).text()).change();
+					    }
+					    else {
+					     myTableAPI
+						 .search( $(this).text()).draw();
+						 $('input[type="search"]').val($(this).text());
+					    }
+
 
 					} );
+
+					$('span:contains(Clear filters)').on('click', function(){
+						myTableAPI
+						 .search( '' )
+						 .columns().search( '' )
+						 .draw();
+						 });
+						 $('select', $(myTableAPI.columns().footer())).val('');
+						 $('input[type="search"]').val('');
+
+						 $.each(myTableAPI.rows().eq(0), function(index){
+						 	var row = myTableAPI.row(index);
+							  if ( row.child.isShown() ) {
+							  	row.nodes().to$().find('img').click();
+							    //row.child.hide();
+							    //var rowindex= row.index();
+							    //myTableAPI.cell(row, myTableAPI.column(0)).to$().click();
+							  }
+					});
+
 					// THIS TRIGGERS SEARCH BOX FUNCTION - OMMITTED IN FOR THE FILTERING OPTION INSTEAD
 					// var table = $('#example').DataTable();
 					// $('table').on( 'click', 'a', function(event) {
