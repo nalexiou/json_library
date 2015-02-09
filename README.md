@@ -34,6 +34,7 @@ In terms of testing the functionality, I would most likely use a framework such 
 Overall, this was a nice challenge for the frontend and becoming familiar with the DataTable plugin allowed me to generate a lot of the ideas/features I had about improving the display of the Library for All content.
 
 Thank you!
+
 Nick Alexiou
 
 
