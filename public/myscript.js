@@ -172,15 +172,8 @@ function generateLinks(d){
 					} );
 
 					$('span:contains(Clear filters)').on('click', function(){
-						myTableAPI
-						 .search( '' )
-						 .columns().search( '' )
-						 .draw();
-						 });
-						 $('select', $(myTableAPI.columns().footer())).val('');
-						 $('input[type="search"]').val('');
 
-						 $.each(myTableAPI.rows().eq(0), function(index){
+						$.each(myTableAPI.rows().eq(0), function(index){
 						 	var row = myTableAPI.row(index);
 							  if ( row.child.isShown() ) {
 							  	row.nodes().to$().find('img').click();
@@ -189,6 +182,15 @@ function generateLinks(d){
 							    //myTableAPI.cell(row, myTableAPI.column(0)).to$().click();
 							  }
 					});
+						 $('select', $(myTableAPI.columns().footer())).val('');
+						 $('input[type="search"]').val('');
+						myTableAPI
+						 .search( '' )
+						 .columns().search( '' )
+						 .draw();
+						 });
+
+
 
 					// THIS TRIGGERS SEARCH BOX FUNCTION - OMMITTED IN FOR THE FILTERING OPTION INSTEAD
 					// var table = $('#example').DataTable();
