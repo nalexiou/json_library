@@ -74,7 +74,7 @@ function generateLinks(d){
 		  	)
 		  	var record = $("<tr>" +
 		  	"<td><img src='/thumbnails/"+ key +".jpg' height='100'></td>" +
-		  	"<td>Title: "+ val.doc.name +"<br><br>Author(s): " + authors.join(", ")+"</td>" +
+		  	"<td><br>Title: "+ val.doc.name +"<br><br>Author(s): " + authors.join(", ")+"</td>" +
 		  	"<td>"+ val.doc.name +"</td>" +
 		  	"<td>"+ generateLinks(authors)+"</a></td>" +		 
 		  	"<td>"+ checkBlurb(val.doc.blurb) +"</td>" +
