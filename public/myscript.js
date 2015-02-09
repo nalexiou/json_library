@@ -176,8 +176,8 @@ function generateLinks(d){
 						$.each(myTableAPI.rows().eq(0), function(index){
 						 	var row = myTableAPI.row(index);
 							  if ( row.child.isShown() ) {
-							  	row.nodes().to$().find('img').click();
-							    //row.child.hide();
+							  	//row.nodes().to$().find('img').click();
+							    row.child.hide();
 							    //var rowindex= row.index();
 							    //myTableAPI.cell(row, myTableAPI.column(0)).to$().click();
 							  }
